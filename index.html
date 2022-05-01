@@ -1,0 +1,209 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
+
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <div id="app">
+      <div class="header">
+        <h1>Dungeons</h1>
+        <button @click="isEdit ? isEdit = false : isEdit = true">{{ isEdit ? "Back" : "Edit"}}</button>
+        <button @click="resetDungeonData()">Reset</button>
+      </div>
+      <div class="section" v-for="(entry, index) in fullList">
+        <h2>{{entry.name}}</h2>
+        <div class="addDungeonsOverlay" v-if="isEdit">
+          <ul class="dungeon-list">
+            <li v-for="dungeon in addDungeons">
+              <img :src="getDungeonImageFile(dungeon)" @click="addDungeon(dungeon, entry.name)" />
+            </li>
+          </ul>
+        </div>
+        <ul class="dungeon-list">
+          <li v-for="dungeon in entry.dungeonList">
+            <img :src="getDungeonImageFile(dungeon)" @click="removeDungeon(dungeon, entry.name)" />
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          playerNames: ['WX78', 'Dunkler Wanderer', 'Verzauberung', 'Homunculus', 'Elbeboje', 'Up Up Down'],
+          fullList: [],
+          addDungeons: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+          isEdit: false,
+        },
+        computed: {},
+        watch: {},
+        methods: {
+          setup: function () {
+            this.loadDungeonData();
+          },
+          loadDungeonData: function () {
+            const localStorageDungeons = JSON.parse(localStorage.getItem('dungeonsFullList'));
+
+            if (localStorageDungeons) {
+              this.fullList = localStorageDungeons;
+            } else {
+              this.fullList = [];
+              this.playerNames.forEach((player) => {
+                this.fullList.push({
+                  name: player,
+                  dungeonList: [],
+                });
+              });
+            }
+
+            this.saveDungeonData();
+          },
+          saveDungeonData: function () {
+            localStorage.setItem('dungeonsFullList', JSON.stringify(this.fullList));
+          },
+          resetDungeonData: function () {
+            if (confirm('Reset all dungeon data?')) {
+              localStorage.removeItem('dungeonsFullList');
+              this.loadDungeonData();
+            }
+          },
+          getDungeonImageFile: function (id) {
+            switch (id) {
+              case 1:
+                return 'img/01_fort.png';
+                break;
+              case 2:
+                return 'img/02_mystic_cave.png';
+                break;
+              case 3:
+                return 'img/03_beast_den.png';
+                break;
+              case 4:
+                return 'img/04_dragon_roost.png';
+                break;
+              case 5:
+                return 'img/05_chaos_portal.png';
+                break;
+              case 6:
+                return 'img/06_battlegrounds.png';
+                break;
+              case 7:
+                return 'img/07_underworld_portal.png';
+                break;
+              case 8:
+                return 'img/08_valley_of_gods.png';
+                break;
+              default:
+                return 'img/00_dungeon.png';
+                break;
+            }
+          },
+          findPlayerIndexByName: function (playerName) {
+            return this.fullList.findIndex((player) => player.name == playerName);
+          },
+          addDungeon: function (dungeonId, playerName) {
+            let index = this.findPlayerIndexByName(playerName);
+
+            this.fullList[index].dungeonList.push(dungeonId);
+            this.fullList[index].dungeonList.sort();
+
+            this.saveDungeonData();
+          },
+          removeDungeon: function (dungeonId, playerName) {
+            if (this.isEdit) {
+              let playerIndex = this.findPlayerIndexByName(playerName);
+              let dungeonIndex = this.fullList[playerIndex].dungeonList.indexOf(dungeonId);
+
+              this.fullList[playerIndex].dungeonList.splice(dungeonIndex, 1);
+
+              this.saveDungeonData();
+            }
+          },
+        },
+        created() {
+          this.setup();
+        },
+      });
+    </script>
+    <style type="text/css">
+      body {
+        color: #3e3e3e;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 14px;
+      }
+
+      .header {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      h1 {
+        margin-right: auto;
+      }
+
+      h2 {
+        font-size: 15px;
+        margin-bottom: 0;
+      }
+
+      button {
+        display: inline-block;
+        margin: 5px;
+        padding: 5px 10px;
+        background-color: #f0efef;
+        border: 1px solid #c7c7cc;
+        box-shadow: rgb(0 0 0 / 15%) 1.95px 1.95px 2.6px;
+        border-radius: 20px;
+      }
+
+      .section {
+        clear: both;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #c7c7cc;
+        overflow: hidden;
+      }
+
+      .dungeon-list {
+        list-style-type: none;
+        margin: 10px 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      .dungeon-list li {
+        float: left;
+        width: 80px;
+        margin: -5px;
+      }
+      .dungeon-list img {
+        width: 100%;
+      }
+
+      .addDungeonsOverlay .dungeon-list {
+        background-color: #f0efef;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: space-between;
+        border: 1px solid #ccc;
+        justify-content: space-between;
+        padding: 5px;
+      }
+
+      .addDungeonsOverlay .dungeon-list li {
+        width: 50px;
+      }
+    </style>
+  </body>
+</html>
