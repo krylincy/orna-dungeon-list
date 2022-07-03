@@ -15,12 +15,15 @@
     <div id="app">
       <div class="header">
         <h1>Dungeons</h1>
-        <button @click="isEdit ? isEdit = false : isEdit = true">{{ isEdit ? "Back" : "Edit"}}</button>
         <button @click="resetDungeonData()">Reset</button>
       </div>
       <div class="section" v-for="(entry, index) in fullList">
+        <button class="button-edit" @click="isEdit === index ? isEdit = false : isEdit = index">
+          {{ isEdit === index ? "Back" : "Edit"}}
+        </button>
+        <span>{{entry.dungeonList.filter(d => d === 0).length}}/{{entry.dungeonList.length}} | </span>
         <h2>{{entry.name}}</h2>
-        <div class="addDungeonsOverlay" v-if="isEdit">
+        <div class="addDungeonsOverlay" v-if="isEdit === index">
           <ul class="dungeon-list">
             <li v-for="dungeon in addDungeons">
               <img :src="getDungeonImageFile(dungeon)" @click="addDungeon(dungeon, entry.name)" />
@@ -29,7 +32,7 @@
         </div>
         <ul class="dungeon-list">
           <li v-for="dungeon in entry.dungeonList">
-            <img :src="getDungeonImageFile(dungeon)" @click="removeDungeon(dungeon, entry.name)" />
+            <img :src="getDungeonImageFile(dungeon)" @click="removeDungeon(dungeon, entry.name, index)" />
           </li>
         </ul>
       </div>
@@ -39,7 +42,16 @@
       var app = new Vue({
         el: '#app',
         data: {
-          playerNames: ['WX78', 'Dunkler Wanderer', 'Verzauberung', 'Homunculus', 'Elbeboje', 'Up Up Down'],
+          playerNames: [
+            'WX78',
+            'Dunkler Wanderer',
+            'Verzauberung',
+            'Homunculus',
+            'Elbeboje',
+            'Up Up Down',
+            'Krapotke',
+            'Otto-von',
+          ],
           fullList: [],
           addDungeons: [0, 1, 2, 3, 4, 5, 6, 7, 8],
           isEdit: false,
@@ -118,8 +130,8 @@
 
             this.saveDungeonData();
           },
-          removeDungeon: function (dungeonId, playerName) {
-            if (this.isEdit && confirm('Remove dungeon from list?')) {
+          removeDungeon: function (dungeonId, playerName, index) {
+            if (this.isEdit === index && confirm('Remove dungeon from list?')) {
               let playerIndex = this.findPlayerIndexByName(playerName);
               let dungeonIndex = this.fullList[playerIndex].dungeonList.indexOf(dungeonId);
 
@@ -138,7 +150,7 @@
       body {
         color: #3e3e3e;
         font-family: Helvetica, Arial, sans-serif;
-        font-size: 14px;
+        font-size: 10px;
         margin: 0;
         padding: 0;
       }
@@ -160,9 +172,10 @@
       }
 
       h2 {
-        font-size: 12px;
+        font-size: 10px;
         margin-bottom: 0;
         margin-top: 10px;
+        display: inline-block;
       }
 
       button {
@@ -173,6 +186,13 @@
         border: 1px solid #c7c7cc;
         box-shadow: rgb(0 0 0 / 15%) 1.95px 1.95px 2.6px;
         border-radius: 20px;
+        font-size: 10px;
+      }
+
+      .button-edit {
+        padding: 2px 6px;
+        float: right;
+        margin-right: 0;
       }
 
       .section {
@@ -184,13 +204,15 @@
 
       .dungeon-list {
         list-style-type: none;
-        margin: 10px 0;
+        margin: 5px 0;
         padding: 0;
         overflow: hidden;
+        clear: both;
       }
+
       .dungeon-list li {
         float: left;
-        width: 60px;
+        width: 50px;
         margin: -5px;
       }
       .dungeon-list img {
@@ -203,7 +225,7 @@
         flex-direction: row;
         flex-wrap: nowrap;
         align-content: space-between;
-        border: 3px dotted #ccc;
+        border: 2px dotted #acacac;
         justify-content: space-between;
         padding: 5px;
       }
