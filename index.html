@@ -15,7 +15,7 @@
     <div id="app">
       <div class="header">
         <h1>Dungeons</h1>
-        <button @click="resetDungeonData()">Reset</button>
+        <button @click="resetDungeonData()">Reset Dungeons</button>
       </div>
       <div class="section" v-for="(entry, index) in fullList">
         <button class="button-edit" @click="isEdit === index ? isEdit = false : isEdit = index">
@@ -38,13 +38,13 @@
       </div>
       <div class="statistics">
         <h2>Statistics</h2>
-        <button @click="resetStatistics()">Reset</button>
+        <button @click="resetStatistics()">Reset Statistics</button>
         <div>Dungons accessable: {{accessableDungeonCount}}</div>
         <div>Dungons saved for statistics: {{dungeonsStatistik.count}}</div>
         <ul class="dungon-statistics">
           <li v-for="dungeon in addDungeons">
             <img :src="getDungeonImageFile(dungeon)" />
-            <span>{{Math.floor(dungeonsStatistik[dungeon]/dungeonsStatistik.count*100) || 0}}%</span>
+            <span>{{Math.floor(dungeonsStatistik[dungeon]/dungeonsStatistik.count*10000) / 100 || 0}}%</span>
           </li>
         </ul>
       </div>
