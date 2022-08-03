@@ -44,7 +44,10 @@
         <ul class="dungon-statistics">
           <li v-for="dungeon in addDungeons">
             <img :src="getDungeonImageFile(dungeon)" />
-            <span>{{Math.floor(dungeonsStatistik[dungeon]/dungeonsStatistik.count*10000) / 100 || 0}}%</span>
+            <span
+              >{{getDungeonStatisticsPercentage(dungeon)}}%
+              <i :class="getDungeonStatisticsTendencyClass(dungeon)" aria-hidden="true"></i
+            ></span>
           </li>
         </ul>
       </div>
@@ -189,6 +192,30 @@
 
               this.saveDungeonData();
             }
+          },
+          getDungeonStatisticsPercentage: function (dungeon) {
+            return Math.floor((this.dungeonsStatistik[dungeon] / this.dungeonsStatistik.count) * 10000) / 100 || 0;
+          },
+          getDungeonStatisticsTendencyClass: function (dungeon) {
+            let currentCountOfDungeon = 0;
+
+            const iconDefaultOrLess = 'fa fa-circle-thin';
+            const iconMore = 'fa fa-circle';
+
+            this.fullList.forEach((player) => {
+              currentCountOfDungeon += player.dungeonList.filter((x) => x == dungeon).length;
+            });
+
+            if (this.accessableDungeonCount == 0) {
+              return iconDefaultOrLess;
+            }
+
+            const oldPercentageOfDungeons = Math.round(this.getDungeonStatisticsPercentage(dungeon));
+            const currentPercentageOfDungeon = Math.round((currentCountOfDungeon * 100) / this.accessableDungeonCount);
+            if (currentPercentageOfDungeon >= oldPercentageOfDungeons) {
+              return iconMore;
+            }
+            return iconDefaultOrLess;
           },
         },
         created() {
