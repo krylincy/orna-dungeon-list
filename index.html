@@ -44,6 +44,7 @@
         <ul class="dungon-statistics">
           <li v-for="dungeon in addDungeons">
             <i :class="getDungeonStatisticsTendencyClass(dungeon)" aria-hidden="true"></i>
+            <span>{{getDungeonStatisticsTendencyText(dungeon)}}</span>
             <img :src="getDungeonImageFile(dungeon)" />
             <span>{{getDungeonStatisticsPercentage(dungeon)}}% </span>
           </li>
@@ -64,6 +65,7 @@
             'Up Up Down',
             'Krapotke',
             'Otto-von',
+            'Home',
           ],
           fullList: [],
           addDungeons: [0, 1, 2, 3, 4, 5, 6, 7, 8],
@@ -215,6 +217,19 @@
             }
             return iconDefaultOrLess;
           },
+          getDungeonStatisticsTendencyText: function (dungeon) {
+            let currentCountOfDungeon = 0;
+            this.fullList.forEach((player) => {
+              currentCountOfDungeon += player.dungeonList.filter((x) => x == dungeon).length;
+            });
+
+            let oldCountOfDungeons = '?';
+            if (this.accessableDungeonCount !== 0) {
+              oldCountOfDungeons = Math.round((this.accessableDungeonCount * this.getDungeonStatisticsPercentage(dungeon)) / 100);
+            }
+
+            return `${currentCountOfDungeon}/${oldCountOfDungeons}`;
+          },
         },
         created() {
           this.setup();
@@ -294,6 +309,7 @@
         width: 50px;
         margin: -5px;
       }
+
       .dungeon-list img {
         width: 100%;
       }
@@ -338,6 +354,7 @@
 
       .dungon-statistics li {
         text-align: center;
+        width: 100%;
       }
 
       .dungon-statistics img {
